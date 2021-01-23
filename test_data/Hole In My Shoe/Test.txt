@@ -1,0 +1,5 @@
+Notes i acords a negres
+Tempo una mica ràpid -> Onsets en els acords seràn correctes?
+Segona pàgina notes lligades
+	- Testejar onsets en els acords.
+	- Testejar onsets en les notes.

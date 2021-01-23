@@ -1,0 +1,3 @@
+3/4
+Test pitch detection with the notes.
+Some chords as quarter notes -> Test pitch and onset detection
