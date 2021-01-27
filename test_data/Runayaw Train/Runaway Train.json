@@ -1,0 +1,31 @@
+{
+ "uid": "Runaway Train",
+ "sandbox": {
+  "path": "",
+  "lilypond_template": "Runaway Train.ly",
+  "code": ""
+},
+ "artist": "",
+ "parts": [
+  {
+   "name": "Full Score",
+   "beats":[]
+
+   ,"chords": [
+    "|G:maj:1 |G:maj:4 N::4 N::2|C:maj:1 |X::1 |E:min:1 |",
+    "|X::1 |A:min:1 |X::1 |G:maj:1 |X::1| ",
+    "|C:maj:4 C:maj:4 C:maj:4 C:maj:4| C:maj:4 C:maj:4 C:maj:4 C:maj:4 |E:min:4 E:min:4 E:min:4 E:min:4 |E:min:4 E:min:4 E:min:4 E:min:4|",
+    "|A:min:4 A:min:4 A:min:4 A:min:4 |A:min:4 A:min:4 A:min:4 A:min:4 |G:maj:4 G:maj:4 G:maj:4 G:maj:4 |G:maj:1 |",
+
+    "|B:(1):4 C:(1):8 C:(1):8 X::4 C:(1):4 |B:(1):4 C:(1):8 C:(1):8 X::4 C:(1):4 |B:(1):4 C:(1):8 C:(1):8 X::4 C:(1):4 |E:(1):4 D:(1):4 C:(1):4 B:(1):4 |",
+    "|B:(1):4 C:(1):8 C:(1):8 X::4 C:(1):4 ||B:(1):4 C:(1):4 G:(1):4 A:(1):4 |A:(1):4 G:(1):8 G:(1):8 X::2 | X::1 |",
+    "|C:maj:4 C:maj:4 C:maj:4 C:maj:4| C:maj:4 C:maj:4 C:maj:4 C:maj:4 |E:min:4 E:min:4 E:min:4 E:min:4 |E:min:4 E:min:4 E:min:4 E:min:4 |A:min:4 A:min:4 A:min:4 A:min:4 |",
+    "|A:min:4 A:min:4 A:min:4 A:min:4 |G:maj:4 G:maj:4 G:maj:4 G:maj:4 |G:maj:4 G:maj:4 G:maj:4 G:maj:4 |G:maj:1 |G:maj:4 N::4 N::2 |C:maj:1 |"
+   ]
+  }
+ ],
+ "duration":1,
+ "metre": "4/4",
+ "title": "Runaway Train Guitar Initial",
+ "tuning": 440
+}

@@ -1,0 +1,37 @@
+{
+ "uid": "Where Did You Sleep Last Night",
+ "sandbox": {
+  "path": "",
+  "lilypond_template": "Where Did You Sleep Last Night.ly",
+  "code": ""
+},
+ "artist": "",
+ "parts": [
+  {
+   "name": "Full Score",
+   "beats":[]
+
+   ,"chords": [
+    "|A:(1):2 A:(1):4 |E:(1):2 E:(1):4 |D:(1):2 E:(1):4 |C:(1):2 D:(1):4 |E:(1):2 D:(1):4 |C:(1):2 B:(1):4 | A:(1):2 X::4 | N::2 N::4 |",
+
+    "|A:(1,5):2 A:(1,5):4 |A:(1,5):2 X::4 |D:maj:2 X::4 |C:maj:2 X::4 |",
+    "|E:maj:2 X::4 |X::2 X::4 |A:(1,5):2 A:(1,5):4 |A:(1,5):2 X::4 |",
+    "|A:(1,5):2 A:(1,5):4 |A:(1,5):2 X::4 |D:maj:2 X::4 |C:maj:2 X::4 |",
+    "|E:maj:2 X::4 |X::2 X::4 |A:(1,5):2 A:(1,5):4 |A:(1,5):2 X::4 |",
+    
+    "|A:(1):2 A:(1):4 |E:(1):2 E:(1):4 |D:(1):2 E:(1):4 |C:(1):2 D:(1):4 |E:(1):2 D:(1):4 |C:(1):2 B:(1):4 | A:(1):2 X::4 | N::2 N::4 |",
+
+    "|A:min:4 A:min:4 A:min:4|A:min:2 X::4 |D:maj:2 X::4 |C:maj:2 X::4 |",
+    "|E:maj:2 E:maj:4 |E:maj:2 X::4 |A:min:4 A:min:4 A:min:4 |A:min:2 X::4|",
+    "|A:min:4 A:min:4 A:min:4|A:min:2 X::4 |D:maj:2 X::4 |C:maj:2 X::4 |",
+    "|E:maj:2 E:maj:4 |E:maj:2 X::4 |A:min:4 A:min:4 A:min:4 |A:min:2 X::4|",
+
+    "|A:(1):2 A:(1):4 |E:(1):2 E:(1):4 |D:(1):2 E:(1):4 |C:(1):2 D:(1):4 |E:(1):2 D:(1):4 |C:(1):2 B:(1):4 | A:(1):2 X::4 | X::2 X::4 |"
+   ]
+  }
+ ],
+ "duration": 1,
+ "metre": "3/4",
+ "title": "",
+ "tuning": 440
+}

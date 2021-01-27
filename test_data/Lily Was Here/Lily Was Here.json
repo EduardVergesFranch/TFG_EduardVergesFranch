@@ -1,0 +1,29 @@
+{
+ "uid": "Lily Was Here",
+ "sandbox": {
+  "path": "",
+  "lilypond_template": "Lily Was Here.ly",
+  "code": ""
+},
+ "artist": "David a Stewart",
+ "parts": [
+  {
+   "name": "Full Score",
+   "beats":[],
+   "chords": [
+      "|E:min:1 |X::1 |N::4 B:(1):8 G:(1):8 X::4 A:(1):8 E:(1):8 |X::1 |A:min:1 |X::1 |",
+      "|N::4 B:(1):8 G:(1):8 X::4 A:(1):8 F#:(1):8 |X::2 N::8 G:(1):8 F#:(1):8 E:(1):8 |X::1 |E:min:1 |",
+      "|N::4 B:(1):8 G:(1):8 X::4 A:(1):8 E:(1):8 |X::1 |A:min:1 |X::1 | N::4 B:(1):8 G:(1):8 X::4 A:(1):8 F#:(1):8 |X::2 N::8 G:(1):8 F#:(1):8 E:(1):8 |X::1 |E:min:1 |",
+
+      "|N::8 E:(1):8 G:(1):8 D:(1):8 X::8 E:(1):4 G:(1):8 |X::1 |A:min:1 |X::1 |",
+      "|N::8 E:(1):8 G:(1):8 D:(1):8 X::8 E:(1):4 A:(1):8 |X::4 X::8 B:(1):8 X::2 |E:min:1 |X::1 |",
+
+      "|N::4 B:(1):8 G:(1):8 X::4 A:(1):8 E:(1):8 |X::1 |A:min:1 |X::1 | N::4 B:(1):8 G:(1):8 X::4 A:(1):8 F#:(1):8 |X::2 N::8 G:(1):8 F#:(1):8 E:(1):8 |X::1 |E:min:1 |"
+    ]
+  }
+ ],
+ "duration":1,
+ "metre": "4/4",
+ "title": "Lily Was Here Guitar Initial",
+ "tuning": 440
+}
