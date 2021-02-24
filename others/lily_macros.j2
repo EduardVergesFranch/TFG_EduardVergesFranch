@@ -1,0 +1,4 @@
+{% macro color() -%}
+     \override NoteHead.color = #(rgb-color{{next_color()}})
+{%- endmacro %}
+

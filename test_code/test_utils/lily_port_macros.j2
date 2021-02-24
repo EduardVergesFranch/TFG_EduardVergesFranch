@@ -1,0 +1,6 @@
+%{ macro eps(first_bar, last_bar) -%}
+_\markup {\general-align #Y #DOWN {\epsfile #Y #%{{plot_height()}%} #"%{{eps_image_for_bars(first_bar, last_bar)}%}"} \hspace #1 }
+%{- endmacro %}
+{% macro color() -%}
+     \override NoteHead.color = #(rgb-color%{ next_color() %})
+{%- endmacro %}
