@@ -1,0 +1,23 @@
+NEXTS STEPS
+
+1-> Obtaian a numerical evaluation of the current pysimmusic software.
+	- Measure how the onset detection works
+	- Measure how pitch classes detection works
+
+
+	-> AFTER MEETING WITH SEVA (10/03/2021)
+		- concentrate on Pitch Detection
+		- Two kinds of metrics possible:
+			- Note Event-wise pitch class sets comparisons (see Bay et al. (2009) ) + CONFUSION MATRIX (1 FOCUS ON THIS)
+			- FRAME WISE evaluation ( same approach but instead of note event-wise do it frame wise and weight durations )
+			
+1 b - > (Understand Training process)
+2-> Using the 6 new songs I transcribed (Guitar Grade 0)
+	- Perform data augmentation:
+		. Recording by my self
+		. Impulse response simmulation different rooms.
+		. Apply random noises ... (randomness)
+		. Same songs recorded faster!
+		
+3- > Compare how different training datasets influentiate the results (The objective is to obtain a perfect transcription for the GT/Ideal performances)
+	- Kind of Cross-Validation!
