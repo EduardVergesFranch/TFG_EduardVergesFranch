@@ -45,7 +45,7 @@ class NewModel(CorrectnessBalanceResidualsModel):
         self.betas = dict()
 
     def preprocess(self, chroma):
-        if chroma.shape[1] >= 2:
+        if chroma.shape[0] >= 1: #Before chroma.shape[1] >= 2
             return preprocessing.normalize(substitute_zeros(chroma), norm='l1')
         else:
             return chroma
@@ -66,12 +66,13 @@ class NewModel(CorrectnessBalanceResidualsModel):
 
         for k in self.kinds:
             chroma = self.preprocess(segments.chromas[segments.kinds == k])
-            partition = [self.in_degree_dict[k], self.out_degree_dict[k]]
-            in_chroma_sums[k] = amalgamate(partition, chroma).transpose()[0]
-            in_chroma_composition = subcomposition([[e] for e in self.in_degree_dict[k]], chroma)
-            print("Now training: ", k)
-            self.betas[k] = beta(*beta.fit(in_chroma_sums[k], floc=0, fscale=1))
-            self.balanceGMMs[k] = self.train_alr_gaussian(in_chroma_composition, self.kind_to_gmm_params[k])
+            if chroma.shape[0] >=2:
+                partition = [self.in_degree_dict[k], self.out_degree_dict[k]]
+                in_chroma_sums[k] = amalgamate(partition, chroma).transpose()[0]
+                in_chroma_composition = subcomposition([[e] for e in self.in_degree_dict[k]], chroma)
+                print("Now training: ", k)
+                self.betas[k] = beta(*beta.fit(in_chroma_sums[k], floc=0, fscale=1))
+                self.balanceGMMs[k] = self.train_alr_gaussian(in_chroma_composition, self.kind_to_gmm_params[k])
 
     def score_balance(self, kind, pre_chromas):
         in_chroma_composition = subcomposition([[e] for e in self.in_degree_dict[kind]], pre_chromas)
@@ -86,20 +87,21 @@ class NewModel(CorrectnessBalanceResidualsModel):
             pos = basePitch * self.n_kinds
             # NOTE: log-ratio preprocessing should be applied to shifted
             # chroma, so we always do it inside loop.
-            pre_chromas = self.preprocess(chromas)
+            pre_chromas = self.preprocess(chromas) #Normalize chroma that all intensities sum to 1
             ki = 0
             for k in self.kinds:
                 partition = [self.in_degree_dict[k], self.out_degree_dict[k]]
-                in_chroma_sums = amalgamate(partition, pre_chromas).transpose()[0]
+                in_chroma_sums = amalgamate(partition, pre_chromas).transpose()[0] #SUm all in chroma intensities
                 in_chroma_composition = subcomposition([[e] for e in self.in_degree_dict[k]], pre_chromas)
-                correctness = self.betas[k].logcdf(in_chroma_sums)
+                correctness = self.betas[k].logcdf(in_chroma_sums) #Check correctness of pitch class -> Not wrong/incorrect/unexpected notes
 
                 if in_chroma_composition.shape[1] > 1:
                     in_chroma_composition = np.apply_along_axis(alr, 1, in_chroma_composition)
-                balance = self.balanceGMMs[k].score_samples(in_chroma_composition)
-                lps[:, pos + ki] = (correctness + balance)
+                balance = self.balanceGMMs[k].score_samples(in_chroma_composition) # Check that notes that are played are balanced in terms of intensity.
+                # Gausian Mixture that assigns probability of belonging to a pitch class set for each chroma detected by NNLS Chroma
+                lps[:, pos + ki] = (correctness + balance) # Save probability of belonging to a specific pitch class set into a matrix
                 ki += 1
-            chromas = np.roll(chromas, -1, axis=1)
+            chromas = np.roll(chromas, -1, axis=1) # Change the firts positon of the chroma to the final position -> (Is the same of changing the rooot) ROOT is the first element of the chroma array
         if normalize:
             norm_sum = logsumexp(lps, axis=1)
             return lps - norm_sum[:, np.newaxis]
@@ -148,7 +150,7 @@ class NewModel(CorrectnessBalanceResidualsModel):
 
     def log_utilities_given_sequence(self, chromas, pitched_patterns, normalize=False):
         if normalize:
-            lu = self.log_utilities(chromas)
+            lu = self.log_utilities(chromas) # Per Chroma probabilities of belonging to a specific pitch class set
             indices = [p.pitch_class_index * self.n_kinds + self.kinds.index(p.kind) for p in pitched_patterns]
             return np.array([lu[i, indices[i]] for i in range(len(indices))])
         else:

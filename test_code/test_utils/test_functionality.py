@@ -16,7 +16,12 @@ from pychord_tools.low_level_features import AnnotatedBeatChromaEstimator, Annot
 from simmusic.feature_extraction import AdaptiveChromaEstimator, ConstUIDExtractor
 from simmusic.chroma_labels import GuitarLabelTranslator
 
+import sys
+sys.path.append('../')
+sys.path.append('./test_utils/')
+sys.path.append('./test_utils/models/')
 from test_utils.training_individual_chord_model import *
+
 
 class MyNNLSChromaEstimator(ChromaEstimator):
     def __init__(self, audio_path_extractor=AudioPathExtractor(), hop_size=2048, sample_rate=44100):
@@ -31,19 +36,34 @@ class MyAdaptiveChromaEstimator(AdaptiveChromaEstimator):
 
     def fill(self, beats, durations, chroma, smoothed_chromas):
         for i in range(len(beats)):
+            """
             s = int(float(beats[i]) *
                     self.sample_rate / self.hop_size)
             d = int(float(durations[i]) *
                     self.sample_rate / self.hop_size)
             d = min(d, len(chroma) - s)
-            w = eval('np.hanning(2*d)')
-            shift = int(d - 0.15 * self.sample_rate / self.hop_size)
-            d = int(d - 0.15 * self.sample_rate / self.hop_size)
-            w = w[shift:shift + d] / np.sum(w[shift:shift + d])
+            w = eval('np.hanning(2*d)') #Use a non-symetric window?
+            shift = int(d - 0.15 * self.sample_rate / self.hop_size) #<---------------- 0 -> Provar un altre 0.15
+            d = int(d - 0.15 * self.sample_rate / self.hop_size) # <----------------0
+            w = w[shift:shift + d] / np.sum(w[shift:shift + d]) # <----------------0
             w = np.reshape(w, (1, d))
             c = chroma[s:s+d]
             smoothed_chromas[i] = np.dot(w, c)
+            """
+            s = int(float(beats[i]) * self.sample_rate / self.hop_size)  # Set start
+            d = int(float(durations[i]) * self.sample_rate / self.hop_size)  # Set duration
+            if len(chroma) - s < d:
+                d = int(len(chroma) - s)
 
+            w = eval('np.hanning(2*d)')  # Construct window
+            if (len(w) == 1) or (len(w) == 2):  # Force window being one for very short notes
+                w = np.ones(len(w))
+            w = w[d:]/ np.sum(w[d:])
+            w = np.reshape(w, (1, d))
+
+            c = chroma[s:s + d]
+
+            smoothed_chromas[i] = np.dot(w, c)
 
 def estimate_segment_scores(
         annotation_filename,
@@ -87,39 +107,46 @@ def estimate_segment_scores(
     return lu, nlu, realSegments
 
 def plot_chroma_scores(real_segments,predicted):
+    plt.rcParams.update({'font.size': 10})
     type_of_notes_list = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     # ------Plotting predictions obtained NNLS Chromas-------------------#
-    fig = plt.figure(figsize=(15,1))
+    fig = plt.figure(figsize=(20,10))
     ax = fig.add_subplot(111)
+
     img = ax.imshow(real_segments.chromas.T,cmap='inferno',aspect='auto',interpolation='nearest')
-    cbar = fig.colorbar(img, ax=ax, shrink=0.3, orientation="horizontal")
-    cbar.set_label('Probability')
+    not_found_chromas = [ind for ind, chroma in enumerate(real_segments.chromas) if all(chroma == 0)] #Localize not found chromas
+    for f in not_found_chromas:
+        ax.axvline(x=f, color='r', linestyle='-', linewidth=2)
+
+    cbar = fig.colorbar(img, ax=ax, shrink=0.1, orientation="vertical")
+    cbar.set_label('Intensity')
+
     ax.set_xticks(range(len(predicted)))
     ax.set_yticks(range(12))
 
     x_label_list = []
-    for n, c in zip(predicted, real_segments.labels):
-        stri = n.__repr__()[0] .replace(':','') + ' '+ c.replace(':','').replace('(','').replace(')','')
-        x_label_list.append(stri)
-    plt.xticks(rotation=-90)
-    #ax.tick_params(axis='x', which='both', length=0)
-    #x_label_list = [n.__repr__()[0]  for n,c in zip(predicted,real_segments.chromas)]
-    y_label_list = [n for n in type_of_notes_list]
+    for i, (n, c) in enumerate(zip(predicted, real_segments.labels)):
+        x_label_list.append(n.__repr__().replace(':','')+ '<--' + c.replace(':','').replace('(','').replace(')',''))
 
     ax.set_xticklabels(x_label_list)
-    ax.set_yticklabels(y_label_list)
-    ax.set_xlabel("Predicted note\nGT note")
+    ax.set_yticklabels(['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
+    ax.set_xlabel("Predicted <-- GT note")
     ax.set_ylabel('Predicted probabilities')
 
-    plt.grid()
+    plt.xticks(rotation=-90)
+    plt.grid(color='w', alpha=0.3, linestyle='-', linewidth=1)
     plt.title('Pysimmusic Predictions')
     plt.show()
 
 def all_chroma_scores(anno_file, audio_file):
-    m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/new_model.pkl')
+    #m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/new_model.pkl')
+    m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/Test1_LWH_Model.pkl')
     lu, nlu, real_segments = estimate_segment_scores(anno_file, audio_file, m)
     predicted, plu = m.predict(real_segments.chromas)
     plot_chroma_scores(real_segments,predicted)
+
+    ##METRICS
+
     #print(predicted)
     return nlu
 

@@ -105,7 +105,7 @@ PartPOneVoiceOne =  \relative a {
     \stemUp %{{color()}%} <a e' a c e>2. \break
 
     | % 41
-    \stemUp %{{color()}%} <a, e' a c e>4 %{{ eps(110,40,43,2)}%} -\mf ^\markup{ \bold\small {\box "Verse" } }
+    \stemUp %{{color()}%} <a e' a c e>4 %{{ eps(110,40,43,2)}%} -\mf ^\markup{ \bold\small {\box "Verse" } }
     \stemUp %{{color()}%} <a e' a c e>4
     \stemUp %{{color()}%} <a e' a c e>4  | % 42
     \stemUp %{{color()}%} <a e' a c e>2. | % 43

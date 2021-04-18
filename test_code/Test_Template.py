@@ -8,8 +8,12 @@ from PIL import Image
 import io
 from pychord_tools.third_party import NNLSChromaEstimator, nnls_chroma_from_audio
 from pychord_tools.low_level_features import AnnotatedBeatChromaEstimator, AnnotatedChromaSegments, ChromaEstimator, AudioPathExtractor
-
+import sys
+sys.path.append('../')
+sys.path.append('./test_utils/')
+sys.path.append('./test_utils/models/')
 from test_utils.training_individual_chord_model import *
+
 from test_utils.test_functionality import GenericWorkflow
 
 from simmusic.feature_extraction import AdaptiveChromaEstimator, ConstUIDExtractor
@@ -30,16 +34,18 @@ if __name__ == "__main__":
         assessment_workflow.chroma_feature_names,
         onset_series_delta=0.22)
 
-    json = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/20th Century Boy/20th Century Boy.json'
-    lily = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/20th Century Boy/20th Century Boy.ly'
-    target_audio = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/20th Century Boy/3_gtrX_20th Century Boy_T Rex_Gtr Gr0.wav'
+
+    json = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Hole In My Shoe/Hole In My Shoe.json'
+    lily = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Hole In My Shoe/Hole In My Shoe.ly'
+    target_audio = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Hole In My Shoe/3_gtrX_Hole In My Shoe_Traffic_Gtr Gr0.wav'
 
     results = guitar.assess_guitar_exercise(json, lily, 0.0, target_audio, assessment_workflow= hacked_workflow,image_format='pdf')
 
-    with open("/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_results/CenturyBoy.pdf", "wb") as out_file:
+
+    with open("/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/Results_Training/Hole In My Shoe1.pdf", "wb") as out_file:
         out_file.write(results["ImageBytes"])
     print('Overall:', results['Overall'])
     print('Rhythm:', results['Rhythm'])
     print('Tuning:', results['Tuning'])
     print('Pitch:', results['Pitch'])
-    os.system('open -a "Adobe Acrobat Reader DC.app" /home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_results/CenturyBoy.pdf')
+    os.system('open -a "Adobe Acrobat Reader DC.app" //home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/Results_Training/Hole In My Shoe1.pdf')

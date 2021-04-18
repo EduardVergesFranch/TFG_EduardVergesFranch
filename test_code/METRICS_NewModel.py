@@ -1,10 +1,15 @@
 # Load pysimmusic assessement for a score
+import sys
+sys.path.append('../')
+sys.path.append('./test_utils/')
+sys.path.append('./test_utils/models/')
+from training_individual_chord_model import *
+
 from test_utils.test_functionality import estimate_segment_scores
 import essentia.standard as ess
 from tempfile import NamedTemporaryFile
 import os
 from pychord_tools.models import load_model
-from test_utils.training_individual_chord_model import *
 from sklearn.mixture import GaussianMixture
 
 from sklearn.metrics import confusion_matrix,accuracy_score,\
@@ -18,14 +23,17 @@ import json
 from IPython.display import display, Markdown
 
 class NewModel_Metrics():
-    def __init__(self,annotation, audio):
-        
+    def __init__(self,annotation, audio, 
+                 model = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/Baseline.pkl', 
+                 info = True, debug = True):
+        self.info = info
+        self.debug = debug
         #Store annotation and audio files
         self.annotation = annotation
         self.audio_file = open(audio, "r", encoding="utf-8")
     
         #Load GT and Predicitons
-        self.real_segments, self.pred = self.all_chroma_scores(self.annotation, self.audio_file.name)
+        self.real_segments, self.pred = self.all_chroma_scores(self.annotation, self.audio_file.name, model)
         self.audio_file.close()
         
         self.pred = [str(self.pred[i]) for i in range(0,len(self.pred))]
@@ -43,15 +51,18 @@ class NewModel_Metrics():
         #Variable where the confusion matrix will be stored
         self.confusion_matrix = None
         
-        #Print Song Information
+        
         with open(self.annotation, 'r') as myfile:
-            data=myfile.read()
+                data=myfile.read()
         obj = json.loads(data)
-        display(Markdown('**Title**: {}'.format(obj['title'])))
-        display(Markdown('**Song Duration**: {} sec.'.format(obj['duration'])))
-        display(Markdown('**Metre**: {}'.format(obj['metre'])))
-        display(Markdown('**Tuning**: {}Hz'.format(obj['tuning'])))
-        display(Markdown('**Measure duration**: {} sec.'.format(np.round(self.measure_duration,2))))
+        self.title = obj['title']
+        #Print Song Information
+        if info:
+            display(Markdown('**Title**: {}'.format(obj['title'])))
+            display(Markdown('**Song Duration**: {} sec.'.format(obj['duration'])))
+            display(Markdown('**Metre**: {}'.format(obj['metre'])))
+            display(Markdown('**Tuning**: {}Hz'.format(obj['tuning'])))
+            display(Markdown('**Measure duration**: {} sec.'.format(np.round(self.measure_duration,2))))
         
         
     def classify_note_durations(self):
@@ -61,33 +72,54 @@ class NewModel_Metrics():
         with open(self.annotation, 'r') as myfile:
             data=myfile.read()
         obj = json.loads(data)
-        measure_duration = np.round(obj['parts'][0]['beats'][4] - obj['parts'][0]['beats'][0],2)
+        if obj['metre'] == '3/4':
+            measure_duration = np.round(obj['parts'][0]['beats'][3] - obj['parts'][0]['beats'][0],2)
+        else:
+            measure_duration = np.round(obj['parts'][0]['beats'][4] - obj['parts'][0]['beats'][0],2)
         
-        i = 0
         notes_durations = {'full':[],'half':[],'quarter': [],'eight': [],'sixteenth':[]}
-
-        for note,l in zip(self.real_segments.durations,self.real_segments.labels):
-            value = np.round(measure_duration / note  ,0)
-            if value <= 1:
-                notes_durations['full'].append(i)
-            elif value <= 2:
-                notes_durations['half'].append(i)
-            elif value <= 4:
-                notes_durations['quarter'].append(i)
-            elif value <= 8:
-                notes_durations['eight'].append(i)
-            else:
-                notes_durations['sixteenth'].append(i)
-            i += 1
-
+        
+        if obj['metre'] == '4/4':
+            i = 0
+            for note,l in zip(self.real_segments.durations,self.real_segments.labels):
+                value = np.round(measure_duration / note  ,0)
+                if value <= 1:
+                    notes_durations['full'].append(i)
+                elif value <= 2:
+                    notes_durations['half'].append(i)
+                elif value <= 4:
+                    notes_durations['quarter'].append(i)
+                elif value <= 8:
+                    notes_durations['eight'].append(i)
+                else:
+                    notes_durations['sixteenth'].append(i)
+                i += 1
+                
+        if obj['metre'] == '3/4':
+            i = 0
+            for note,l in zip(self.real_segments.durations,self.real_segments.labels):
+                value = np.round(measure_duration / note  ,0)
+                if value <= 1:
+                    notes_durations['full'].append(i)
+                elif value <= 2:
+                    notes_durations['half'].append(i)
+                elif value <= 3:
+                    notes_durations['quarter'].append(i)
+                elif value <= 6:
+                    notes_durations['eight'].append(i)
+                else:
+                    notes_durations['sixteenth'].append(i)
+                i += 1
         return np.round(measure_duration,2), notes_durations
     
-    def all_chroma_scores(self,anno_file, audio_file):
+    def all_chroma_scores(self,anno_file, audio_file , model):
         """
         Return GT and predicte pitch class sets.
         """
         
-        m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/new_model.pkl')
+        #m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/new_model.pkl')
+        #m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/Test1_LWH_Model.pkl')
+        m = load_model(model)
         lu, nlu, real_segments = estimate_segment_scores(anno_file, audio_file, m)
 
         predicted, plu = m.predict(real_segments.chromas)
@@ -105,7 +137,7 @@ class NewModel_Metrics():
         if desired_notes:
             gt,pred = self.get_desired_notes(desired_notes)
         else:
-            print('Note duration not specified / Not Found! -> PRINTING GENERAL STATS')
+            if self.debug: print('Note duration not specified / Not Found! -> PRINTING GENERAL STATS')
             gt = self.gt
             pred = self.pred
             
@@ -127,9 +159,9 @@ class NewModel_Metrics():
         
         if normalize:
             self.confusion_matrix = self.confusion_matrix.astype('float') / self.confusion_matrix.sum(axis=1)[:, np.newaxis]
-            print("Normalized confusion matrix")
+            if self.debug: print("Normalized confusion matrix")
         else:
-            print('Confusion matrix, without normalization')
+            if self.debug: print('Confusion matrix, without normalization')
         
         plt.figure(figsize = (15,15))
         plt.imshow(self.confusion_matrix, interpolation='nearest', cmap=cmap)
@@ -153,7 +185,7 @@ class NewModel_Metrics():
         plt.tight_layout()
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
-            
+        plt.show()
     def overall_accuracy(self,desired_notes = None):
         """
         Compute the overall accuracy -> Ideal would be 1
@@ -161,7 +193,7 @@ class NewModel_Metrics():
         if desired_notes:
             gt,pred = self.get_desired_notes(desired_notes)
         else:
-            print('Note duration not specified / Not Found! -> PRINTING GENERAL STATS')
+            if self.debug: print('Note duration not specified / Not Found! -> PRINTING GENERAL STATS')
             gt = self.gt
             pred = self.pred
             
@@ -176,7 +208,7 @@ class NewModel_Metrics():
         if desired_notes:
             gt,pred = self.get_desired_notes(desired_notes)
         else:
-            print('Note duration not specified / Not Found! -> PRINTING GENERAL STATS')
+            if self.debug: print('Note duration not specified / Not Found! -> PRINTING GENERAL STATS')
             gt = self.gt
             pred = self.pred
             
@@ -245,16 +277,35 @@ class NewModel_Metrics():
         fig.tight_layout()
         plt.xticks(rotation=45)
         plt.show()
-    
+        
+    def pitch_class_set_support_histogram(self,hist = True,desired_notes = None):
+        _,_,_, support = self.per_class_performance(desired_notes = desired_notes)
+
+        if hist:
+            fig, ax = plt.subplots(figsize = (15,5))
+            ax.bar(range(len(self.list_pitch_classes)), support, align='center')
+            ax.set_xticks(range(len(self.list_pitch_classes)))
+            ax.set_xticklabels(self.list_pitch_classes)
+
+            ax.set_ylabel('Freq.')
+            ax.set_xlabel('Pitch Class Sets')
+            ax.set_title('Frequency of each Pitch Class Set')
+            fig.tight_layout()
+            plt.grid(axis='y', alpha=0.75)
+            plt.xticks(rotation=45)
+            plt.show()
+        
+        return support
+        
     def miss_detection_errors(self,conf_matrix = False):
         not_found_chromas = [ind for ind, chroma in enumerate(self.real_segments.chromas) if all(chroma == 0)]
         
         percentage_missed = len(not_found_chromas) / len(self.gt)
-        print('Missed {}% of the chromas.'.format(np.round(percentage_missed * 100,2)))
+        if self.debug: print('Missed {}% of the chromas.'.format(np.round(percentage_missed * 100,2)))
         
         if conf_matrix:
             self.plot_confusion_matrix(desired_notes = not_found_chromas)
-        
+                 
         return percentage_missed, not_found_chromas
     def plot_chroma_scores(self):
         plt.rcParams.update({'font.size': 10})
