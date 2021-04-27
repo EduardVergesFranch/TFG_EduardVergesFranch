@@ -1,7 +1,7 @@
 {
  "uid": "Where Did You Sleep Last Night",
  "sandbox": {
-  "path": "/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Where Did You Sleep Last Night/3_gtrX_Where Did You Sleep Last Night_Nirvana_Gtr Gr0.wav",
+  "path": "%PYSIM_CHORDS_TEST_DATA_DIR%/Where Did You Sleep Last Night/3_gtrX_Where Did You Sleep Last Night_Nirvana_Gtr Gr0.wav",
   "lilypond_template": "Where Did You Sleep Last Night.ly",
   "code": ""
 },

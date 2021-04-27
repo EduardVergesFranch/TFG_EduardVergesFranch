@@ -1,7 +1,7 @@
 {
  "uid": "Lily Was Here",
  "sandbox": {
-  "path": "/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Lily Was Here/3_gtrX_Lily Was Here_David A Stewart_Gtr Gr0.wav",
+  "path": "%PYSIM_CHORDS_TEST_DATA_DIR%/Lily Was Here/3_gtrX_Lily Was Here_David A Stewart_Gtr Gr0.wav",
   "lilypond_template": "Lily Was Here.ly",
   "code": ""
   },

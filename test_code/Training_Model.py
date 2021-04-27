@@ -1,15 +1,18 @@
 import sys
-sys.path.append('../')
-sys.path.append('./test_utils/')
-sys.path.append('./test_utils/models/')
+
+sys.path.append('..')
+#sys.path.append('./test_utils/')
+#sys.path.append('./test_utils/models/')
 
 from pychord_tools.low_level_features import  AnnotatedBeatChromaEstimator
 from pychord_tools.third_party import NNLSChromaEstimator
 from simmusic.feature_extraction import AdaptiveChromaEstimator, GuitarLabelTranslator
 
-from training_individual_chord_model import NewModel,SimUidAndAudioPathExtractor
+from test_code.test_utils.training_individual_chord_model import NewModel,SimUidAndAudioPathExtractor
 import joblib
 import numpy as np
+
+BASE_PATH = "/Users/seva/MTG/TFG_EduardVergesFranch"
 
 def append_to_segments(segments, chunk):
     segments.chromas = np.concatenate((segments.chromas, chunk.chromas))
@@ -27,7 +30,7 @@ def load_segments_for_trainning(annotations):
         segment_chroma_estimator=AdaptiveChromaEstimator(),
         #    segment_chroma_estimator=SmoothedStartingBeatChromaEstimator(0.6),
         label_translator=GuitarLabelTranslator(),
-        uid_extractor=SimUidAndAudioPathExtractor('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/'))
+        uid_extractor=SimUidAndAudioPathExtractor(BASE_PATH + '/test_data/'))
 
     for i, ann in enumerate(annotations):
         if i == 0:
@@ -40,12 +43,13 @@ def load_segments_for_trainning(annotations):
 #model = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/Baseline.pkl'
 #m = joblib.load(open(model, 'rb'))
 
-store = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/'
-annotations = ['/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Lily Was Here/Lily Was Here.json',
-              '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Hole In My Shoe/Hole In My Shoe.json',
-              '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/20th Century Boy/20th Century Boy.json',
-              '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Where Did You Sleep Last Night/Where Did You Sleep Last Night.json',
-              '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Runaway Train/Runaway Train.json']
+store =        BASE_PATH + '/test_code/test_utils/models/'
+annotations = ['/test_data/Lily Was Here/Lily Was Here.json',
+               '/test_data/Hole In My Shoe/Hole In My Shoe.json',
+               '/test_data/20th Century Boy/20th Century Boy.json',
+               '/test_data/Where Did You Sleep Last Night/Where Did You Sleep Last Night.json',
+               '/test_data/Runaway Train/Runaway Train.json']
+annotations = [ BASE_PATH + x for x in annotations]
 
 
 segments = load_segments_for_trainning(annotations)
