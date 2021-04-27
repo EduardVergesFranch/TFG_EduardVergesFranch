@@ -1,0 +1,6 @@
+/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Lily Was Here/Lily Was Here.json
+/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Hole In My Shoe/Hole In My Shoe.json
+/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Mountain At My Gates/Mountain At My Gates.json
+/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/20th Century Boy/20th Century Boy.json
+/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Where Did You Sleep Last Night/Where Did You Sleep Last Night.json
+/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Runaway Train/Runaway Train.json

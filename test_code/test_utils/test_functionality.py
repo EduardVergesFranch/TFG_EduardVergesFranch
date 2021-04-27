@@ -4,24 +4,22 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+
 from pychord_tools.models import load_model
-import simmusic
-import simmusic.feature_extraction as feature_extraction
+
 import simmusic.extractors.guitar as guitar
-from PIL import Image
-import io
+
 from pychord_tools.third_party import NNLSChromaEstimator, nnls_chroma_from_audio
 from pychord_tools.low_level_features import AnnotatedBeatChromaEstimator, AnnotatedChromaSegments, ChromaEstimator, AudioPathExtractor
 from simmusic.feature_extraction import AdaptiveChromaEstimator, ConstUIDExtractor
 from simmusic.chroma_labels import GuitarLabelTranslator
 
 import sys
-sys.path.append('../')
-sys.path.append('./test_utils/')
-sys.path.append('./test_utils/models/')
-from test_utils.training_individual_chord_model import *
+sys.path.append('./')
+sys.path.append('./test_code/test_utils/')
+sys.path.append('./test_code/test_utils/models/')
 
+from test_utils.training_individual_chord_model import *
 
 class MyNNLSChromaEstimator(ChromaEstimator):
     def __init__(self, audio_path_extractor=AudioPathExtractor(), hop_size=2048, sample_rate=44100):
@@ -36,8 +34,8 @@ class MyAdaptiveChromaEstimator(AdaptiveChromaEstimator):
 
     def fill(self, beats, durations, chroma, smoothed_chromas):
         for i in range(len(beats)):
-            """
-            s = int(float(beats[i]) *
+
+            """s = int(float(beats[i]) *
                     self.sample_rate / self.hop_size)
             d = int(float(durations[i]) *
                     self.sample_rate / self.hop_size)
@@ -48,22 +46,24 @@ class MyAdaptiveChromaEstimator(AdaptiveChromaEstimator):
             w = w[shift:shift + d] / np.sum(w[shift:shift + d]) # <----------------0
             w = np.reshape(w, (1, d))
             c = chroma[s:s+d]
-            smoothed_chromas[i] = np.dot(w, c)
-            """
+            smoothed_chromas[i] = np.dot(w,c)"""
+
+
             s = int(float(beats[i]) * self.sample_rate / self.hop_size)  # Set start
             d = int(float(durations[i]) * self.sample_rate / self.hop_size)  # Set duration
             if len(chroma) - s < d:
                 d = int(len(chroma) - s)
-
+            
             w = eval('np.hanning(2*d)')  # Construct window
             if (len(w) == 1) or (len(w) == 2):  # Force window being one for very short notes
                 w = np.ones(len(w))
             w = w[d:]/ np.sum(w[d:])
             w = np.reshape(w, (1, d))
-
+            
             c = chroma[s:s + d]
-
+            
             smoothed_chromas[i] = np.dot(w, c)
+
 
 def estimate_segment_scores(
         annotation_filename,
@@ -86,6 +86,7 @@ def estimate_segment_scores(
         label_translator=GuitarLabelTranslator(),
         uid_extractor=ConstUIDExtractor(student_filename),
         roll_to_c_root=False)
+
     realSegments = chromaEstimator.load_chromas_for_annotation_file(annotation_filename)
     # filter out unclassified:
     is_defined = [x != 'unclassified' for x in realSegments.kinds]
@@ -106,7 +107,7 @@ def estimate_segment_scores(
 
     return lu, nlu, realSegments
 
-def plot_chroma_scores(real_segments,predicted):
+def plot_chroma_scores(real_segments,predicted,save_path = None):
     plt.rcParams.update({'font.size': 10})
     type_of_notes_list = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     # ------Plotting predictions obtained NNLS Chromas-------------------#
@@ -136,14 +137,15 @@ def plot_chroma_scores(real_segments,predicted):
     plt.xticks(rotation=-90)
     plt.grid(color='w', alpha=0.3, linestyle='-', linewidth=1)
     plt.title('Pysimmusic Predictions')
-    plt.show()
+    if save_path:
+        plt.savefig(save_path)
+    #plt.show()
 
-def all_chroma_scores(anno_file, audio_file):
-    #m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/new_model.pkl')
-    m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/Test1_LWH_Model.pkl')
+def all_chroma_scores(anno_file, audio_file, save_path):
+    m = load_model( './test_code/test_utils/models/Baseline_Thirds.pkl')
     lu, nlu, real_segments = estimate_segment_scores(anno_file, audio_file, m)
     predicted, plu = m.predict(real_segments.chromas)
-    plot_chroma_scores(real_segments,predicted)
+    plot_chroma_scores(real_segments,predicted, save_path)
 
     ##METRICS
 
@@ -159,7 +161,8 @@ class GenericWorkflow(guitar.AssessmentWorkflow):
                  tuning_feature_names,
                  timing_feature_names,
                  chroma_feature_names,
-                 onset_series_delta=0.22):
+                 onset_series_delta=0.22,
+                 path_chroma = None):
         super().__init__(
             tuning_estimator,
             rhythm_estimator,
@@ -169,6 +172,7 @@ class GenericWorkflow(guitar.AssessmentWorkflow):
             timing_feature_names,
             chroma_feature_names,
             onset_series_delta=onset_series_delta)
+        self.save_chroma_path = path_chroma
 
     def chroma_scores(self, anno_file, audio_file):
-        return all_chroma_scores(anno_file, audio_file)
+        return all_chroma_scores(anno_file, audio_file, self.save_chroma_path)

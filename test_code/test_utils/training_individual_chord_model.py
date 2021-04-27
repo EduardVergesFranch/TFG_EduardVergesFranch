@@ -45,7 +45,7 @@ class NewModel(CorrectnessBalanceResidualsModel):
         self.betas = dict()
 
     def preprocess(self, chroma):
-        if chroma.shape[0] >= 1: #Before chroma.shape[1] >= 2
+        if chroma.shape[0] >= 2: #Before chroma.shape[1] >= 2 [0,12]
             return preprocessing.normalize(substitute_zeros(chroma), norm='l1')
         else:
             return chroma
@@ -54,8 +54,8 @@ class NewModel(CorrectnessBalanceResidualsModel):
         gmm = GaussianMixture(**params_dict)
         if vectors.shape[1] > 1:
             vectors = np.apply_along_axis(alr, 1, vectors)
-        gmm.fit(vectors)
-        return gmm
+            gmm.fit(vectors)
+            return gmm
 
     def fit(self, segments):
         """
@@ -64,9 +64,10 @@ class NewModel(CorrectnessBalanceResidualsModel):
         """
         in_chroma_sums = dict()
 
-        for k in self.kinds:
-            chroma = self.preprocess(segments.chromas[segments.kinds == k])
-            if chroma.shape[0] >=2:
+        for k in self.kinds: #maj, min , 1, 5 , +3, -3
+            chroma_raw = segments.chromas[segments.kinds == k]
+            if chroma_raw.shape[0] >= 2:
+                chroma = self.preprocess(chroma_raw)
                 partition = [self.in_degree_dict[k], self.out_degree_dict[k]]
                 in_chroma_sums[k] = amalgamate(partition, chroma).transpose()[0]
                 in_chroma_composition = subcomposition([[e] for e in self.in_degree_dict[k]], chroma)
@@ -308,11 +309,15 @@ if __name__ == "__main__":
     #
 
     new_model = NewModel(
-        {'maj':['I', 'III', 'V'], 'min':['I', 'IIIb', 'V'], '5':['I', 'V'], '1':['I', 'V', 'III']},
+        {'maj':['I', 'III', 'V'], 'min':['I', 'IIIb', 'V'], '5':['I', 'V'], '1':['I', 'V', 'III'],
+         '+3':['I','III'], 'b3':['bIII']},
+
         {'maj':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
          'min':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
          '5':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
-         '1':{'n_components':1, 'covariance_type':'full', 'max_iter':200}})
+         '1':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
+         '+3':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
+         '-3':{'n_components':1, 'covariance_type':'full', 'max_iter':200}})
     new_model.fit(segments)
     new_model.save_model('new_model.pkl')
     

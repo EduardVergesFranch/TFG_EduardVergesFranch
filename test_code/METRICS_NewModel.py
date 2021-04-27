@@ -39,10 +39,17 @@ class NewModel_Metrics():
         self.pred = [str(self.pred[i]) for i in range(0,len(self.pred))]
         self.gt = [x.replace('(','') for x in self.real_segments.labels]
         self.gt = [x.replace(')','') for x in self.gt]
+        for i,p in enumerate(self.gt):
+            if '1,3' in p:
+                self.gt[i] = self.gt[i].replace('1,3','+3')
+            elif '1,b3' in p:
+                self.gt[i] = self.gt[i].replace('1,b3','-3')
+            else:
+                pass
         
         #Load all possible pitch class sets defined by the model
         self.pitch_class_names = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
-        self.pitch_class_kinds = ['maj','min','5','1']
+        self.pitch_class_kinds = ['maj','min','5','1','+3','-3']
         pitch_classes_matrix = np.array(np.meshgrid(self.pitch_class_names,self.pitch_class_kinds)).T.reshape(-1,2)
         self.list_pitch_classes =[':'.join(x) for x in pitch_classes_matrix]
         
@@ -117,12 +124,12 @@ class NewModel_Metrics():
         Return GT and predicte pitch class sets.
         """
         
-        #m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/new_model.pkl')
-        #m = load_model('/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/Test1_LWH_Model.pkl')
         m = load_model(model)
         lu, nlu, real_segments = estimate_segment_scores(anno_file, audio_file, m)
 
         predicted, plu = m.predict(real_segments.chromas)
+
+            
     #     plot_chroma_scores(real_segments,predicted)
 
         return real_segments, predicted
@@ -144,6 +151,37 @@ class NewModel_Metrics():
         self.confusion_matrix = confusion_matrix(gt,pred,labels = self.list_pitch_classes)
         return self.confusion_matrix
     
+    def plot_simple_conf_matrix(self,plot = True, labels = None):
+        cm = confusion_matrix(self.gt, self.pred, labels = labels)
+        if labels == None:
+            labels = list(set(self.gt))
+        if plot:
+            plt.figure(figsize = (15,15))
+
+            plt.imshow(cm, interpolation='nearest', cmap = plt.cm.Blues)
+            plt.title('Simple Confusion Matrix')
+            plt.colorbar(fraction=0.046, pad=0.04)
+            tick_marks = np.arange(len(labels))
+
+            plt.xticks(tick_marks, labels, rotation=45)
+            plt.yticks(tick_marks, labels)
+
+            fmt = 'd'
+            thresh = cm.max() / 2.
+
+            for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+                if cm[i,j] > 0:
+                    plt.text(j, i, format(cm[i, j], fmt),
+                             horizontalalignment="center",
+                             verticalalignment = 'center',
+                             color="white" if cm[i, j] > thresh else "black")
+            plt.grid(alpha = 0.3)
+            plt.tight_layout()
+            plt.ylabel('True label')
+            plt.xlabel('Predicted label')
+            plt.show()
+        
+        return cm
     def plot_confusion_matrix(self,desired_notes = None, normalize=False):
                          
         """
