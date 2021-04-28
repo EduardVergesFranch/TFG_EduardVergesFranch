@@ -12,6 +12,7 @@ from test_code.test_utils.training_individual_chord_model import NewModel,SimUid
 import joblib
 import numpy as np
 
+# Make it environment variable
 BASE_PATH = "/Users/seva/MTG/TFG_EduardVergesFranch"
 
 def append_to_segments(segments, chunk):
@@ -43,23 +44,24 @@ def load_segments_for_trainning(annotations):
 #model = '/home/eduard/Escritorio/TFG_EduardVergesFranch/test_code/test_utils/models/Baseline.pkl'
 #m = joblib.load(open(model, 'rb'))
 
-store =        BASE_PATH + '/test_code/test_utils/models/'
-annotations = ['/test_data/Lily Was Here/Lily Was Here.json',
-               '/test_data/Hole In My Shoe/Hole In My Shoe.json',
-               '/test_data/20th Century Boy/20th Century Boy.json',
-               '/test_data/Where Did You Sleep Last Night/Where Did You Sleep Last Night.json',
-               '/test_data/Runaway Train/Runaway Train.json']
-annotations = [ BASE_PATH + x for x in annotations]
+if __name__ == '__main__':
+    store =        BASE_PATH + '/test_code/test_utils/models/'
+    annotations = ['/test_data/Lily Was Here/Lily Was Here.json',
+                   '/test_data/Hole In My Shoe/Hole In My Shoe.json',
+                   '/test_data/20th Century Boy/20th Century Boy.json',
+                   '/test_data/Where Did You Sleep Last Night/Where Did You Sleep Last Night.json',
+                   '/test_data/Runaway Train/Runaway Train.json']
+    annotations = ['/test_data/Runaway Train/Runaway Train.json']
+    annotations = [ BASE_PATH + x for x in annotations]
 
+    segments = load_segments_for_trainning(annotations)
 
-segments = load_segments_for_trainning(annotations)
+    m = NewModel(
+            {'maj':['I', 'III', 'V'], 'min':['I', 'IIIb', 'V'], '5':['I', 'V'], '1':['I', 'V', 'III']},
+            {'maj':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
+             'min':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
+             '5':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
+             '1':{'n_components':1, 'covariance_type':'full', 'max_iter':200}})
 
-m = NewModel(
-        {'maj':['I', 'III', 'V'], 'min':['I', 'IIIb', 'V'], '5':['I', 'V'], '1':['I', 'V', 'III']},
-        {'maj':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
-         'min':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
-         '5':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
-         '1':{'n_components':1, 'covariance_type':'full', 'max_iter':200}})
-
-m.fit(segments)
-#m.save_model(store + 'OverfitedModel.pkl')
+    m.fit(segments)
+    m.save_model(store + 'OverfitedModel.pkl')
