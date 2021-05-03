@@ -1,7 +1,7 @@
 {
  "uid": "Mountain At My Gates",
  "sandbox": {
-  "path": "/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/Mountain At My Gates/3_gtrX_Mountain At My Gates_Foals_Gtr Gr0.wav",
+  "path": "%PYSIM_CHORDS_TEST_DATA_DIR%/test_data/Mountain At My Gates/3_gtrX_Mountain At My Gates_Foals_Gtr Gr0.wav",
   "lilypond_template": "Mountain At My Gates.ly",
   "code": ""
 },

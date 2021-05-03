@@ -1,7 +1,7 @@
 {
  "uid": "20th Century Boy",
  "sandbox": {
-  "path": "/home/eduard/Escritorio/TFG_EduardVergesFranch/test_data/20th Century Boy/3_gtrX_20th Century Boy_T Rex_Gtr Gr0.wav",
+  "path": "%PYSIM_CHORDS_TEST_DATA_DIR%/test_data/20th Century Boy/3_gtrX_20th Century Boy_T Rex_Gtr Gr0.wav",
   "lilypond_template": "20th Century Boy.ly",
   "code": ""
 },
