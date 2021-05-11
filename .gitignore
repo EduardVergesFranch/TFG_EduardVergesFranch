@@ -125,5 +125,10 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+#added by myself
+DATA_AUGMENTATION/IR/*.wav
+Databases/Augmented_database/*.wav
+Databases/Raw_database/*.wav
+
 # Pyre type checker
 .pyre/
