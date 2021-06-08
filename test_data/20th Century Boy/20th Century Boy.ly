@@ -15,7 +15,6 @@ _\markup {
 
 \header {
     title = "20th Century Boy"
-    composer = "Guitar Grade 0"
     }
 
 #(set-global-staff-size 20.004375410194708)

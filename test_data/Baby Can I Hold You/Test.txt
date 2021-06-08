@@ -1,5 +1,0 @@
-Acords a negres
-	- Onsets
-	- Pitch detection
-No hi ha backing track!!!!!!!
-Pude només amb un tros de la partitura per testejar ja n'hi hauria prou.

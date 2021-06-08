@@ -126,9 +126,19 @@ venv.bak/
 dmypy.json
 
 #added by myself
-DATA_AUGMENTATION/IR/*.wav
-Databases/Augmented_database/*.wav
+Databases/IR/*.wav
+Databases/IR/*.flac
+Databases/IR/MIR/*.wav
+Databases/IR/AllurePack/*.wav
+Databases/IR/MeldaProduction_Box/*.flac
+Databases/IR/MeldaProduction_Box/*.wav
+Databases/IR/MeldaProduction_Microphones/*.flac
+Databases/IR/MeldaProduction_Rooms/*.flac
+
+
+Databases/Augmented_database/*.zip
 Databases/Raw_database/*.wav
+Cached_Segments/
 
 # Pyre type checker
 .pyre/

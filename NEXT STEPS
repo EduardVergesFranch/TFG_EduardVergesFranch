@@ -1,7 +1,0 @@
-NEXTS STEPS
-
-
-1-> Cross-Validation with new Dataset
-2-> Augment the dataset for having larger recordings
-	- Create documentation about how the dataset was created.
-	- Add json files to dataset to have audio & transcription.

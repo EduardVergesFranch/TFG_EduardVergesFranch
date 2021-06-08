@@ -11,8 +11,8 @@ _\markup {
 %{- endmacro %}
 \pointAndClickOff
 
-\header {
-    tagline =  ""
+\\header {
+    title = "Lily Was Here"
     }
 
 #(set-global-staff-size 18.581589107904897)

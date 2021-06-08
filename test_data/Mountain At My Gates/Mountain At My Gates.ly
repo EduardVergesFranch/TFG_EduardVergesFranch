@@ -15,7 +15,7 @@ _\markup {
 \pointAndClickOff
 
 \header {
-    tagline =  ""
+    title = "Mountain At My Gates"
     }
 
 #(set-global-staff-size 20.004375410194708)

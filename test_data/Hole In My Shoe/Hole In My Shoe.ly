@@ -12,9 +12,8 @@ _\markup {
 \pointAndClickOff
 
 \header {
-    tagline =  ""
+    title = "Hole In My Shoe"
     }
-
 #(set-global-staff-size 20.004375410194708)
 \paper {
     

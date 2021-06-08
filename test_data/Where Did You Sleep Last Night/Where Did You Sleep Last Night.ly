@@ -14,9 +14,8 @@ _\markup {
 \pointAndClickOff
 
 \header {
-    tagline =  ""
-    }
-
+    title = "Where Did You Sleep Last Night"
+ }
 #(set-global-staff-size 20.00)
 \paper {
     page-breaking = #ly:one-page-breaking

@@ -13,7 +13,7 @@ _\markup {
 \pointAndClickOff
 
 \header {
-    tagline =  ""
+    title = "Runaway Train"
     }
 
 #(set-global-staff-size 20.004375410194708)

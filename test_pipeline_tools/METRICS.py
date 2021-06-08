@@ -1,7 +1,9 @@
 # Load pysimmusic assessement for a score
+import sys
+sys.path.append('../')
 
-from test_code.test_utils.training_individual_chord_model import *
-from test_code.test_utils.test_functionality import estimate_segment_scores
+from Code.test_utils.training_individual_chord_model import *
+from Code.test_utils.test_functionality import estimate_segment_scores
 
 from pychord_tools.models import load_model
 
@@ -11,31 +13,68 @@ from sklearn.metrics import confusion_matrix,accuracy_score,\
 import statistics
 import matplotlib.pyplot as plt
 import itertools
-
+import pandas as pd
 import json
 
 from IPython.display import display, Markdown
 
-class Overall_Metrics():
-    def __init__(self, gt, pred):
-        self.gt = gt
-        self.pred = pred
-        self.labels = list(set(self.gt + self.pred))
+annotations_paths = ['../test_data/Lily Was Here/Lily Was Here.json',
+        '../test_data/Mountain At My Gates/Mountain At My Gates.json',
+        '../test_data/20th Century Boy/20th Century Boy.json',
+        '../test_data/Where Did You Sleep Last Night/Where Did You Sleep Last Night.json',
+        '../test_data/Hole In My Shoe/Hole In My Shoe.json', 
+        '../test_data/Runaway Train/Runaway Train.json']    
+songs = ['Lily','Mountain','Century','Where','Hole','Train']
+guitars = ['Eastman','Larrivee','Telecaster','Epiphone','Ibanez']
 
+def precison_recall_bar_plot(precision, recall, support, labels, path):
+    x = np.arange(len(labels))  # the label locations
+    width = 0.40  # the width of the bars
+
+    fig, ax = plt.subplots(figsize=(15, 5))
+    ax.bar(x - width / 2, precision, width, label='Precision', align='center')
+    ax.bar(x + width / 2, recall, width, label='Recall', align='center')
+
+    present = np.where(support > 0)[0]
+    for p in present:
+        ax.axvline(x=p, color='r', linestyle='--')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Scores')
+    ax.set_xlabel('Kinds')
+    ax.set_title('Performance by Music Event kind')
+    ax.set_xticks(x)
+
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    fig.tight_layout()
+    plt.xticks(rotation=45)
+
+    if path:
+        plt.savefig(path)
+    plt.show()
+    
+class Kind_Metrics ():
+    def __init__(self, kinds, pred, labels= ['maj','min','1','5','+3','-3']):
+        pred_kinds = [p.split(':')[-1] for p in pred]
+
+        self.gt = kinds
+        self.pred = pred_kinds
+        self.labels = labels
     def accuracy(self, info = True):
         acc = np.round(accuracy_score(self.gt,self.pred), 4)
         if info : print('Accuracy: {}'.format(acc))
         return acc
-
-    def conf_matrix(self, plot = True):
+    def conf_matrix(self, plot = True , path = None):
 
         cm = confusion_matrix(self.gt, self.pred, labels=self.labels)
 
         if plot:
-            plt.figure(figsize=(15, 15))
+            plt.figure(figsize=(5, 5))
 
             plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-            plt.title('Simple Confusion Matrix')
+            plt.title('Confusion Matrix')
             plt.colorbar(fraction=0.046, pad=0.04)
             tick_marks = np.arange(len(self.labels))
 
@@ -55,114 +94,112 @@ class Overall_Metrics():
             plt.tight_layout()
             plt.ylabel('True label')
             plt.xlabel('Predicted label')
+            if path:
+                plt.savefig(path)
             plt.show()
-        return cm
-
-    def per_class_performance(self):
+        return cm    
+    
+    def per_kind_performance(self, path = None):
         precision, recall, f_score, support = precision_recall_fscore_support(self.gt,
                                                                               self.pred,
                                                                               labels=self.labels)
-        x = np.arange(len(self.labels))  # the label locations
-        width = 0.40  # the width of the bars
+        precison_recall_bar_plot(precision, recall,support, self.labels, path)
+        
+        return precision, recall
+    
+class Overall_Metrics():
+    def __init__(self, gt, pred):
+        self.gt = gt
+        self.pred = pred
+        self.labels = list(set(self.gt + self.pred))
 
-        fig, ax = plt.subplots(figsize=(15, 5))
-        ax.bar(x - width / 2, precision, width, label='Precision', align='center')
-        ax.bar(x + width / 2, recall, width, label='Recall', align='center')
+    def accuracy(self, info = True):
+        acc = np.round(accuracy_score(self.gt,self.pred), 4)
+        if info : print('Accuracy: {}'.format(acc))
+        return acc
 
-        present = np.where(support > 0)[0]
-        for p in present:
-            ax.axvline(x=p, color='r', linestyle='--')
+    def conf_matrix(self, plot = True, path = None):
 
-        # Add some text for labels, title and custom x-axis tick labels, etc.
-        ax.set_ylabel('Scores')
-        ax.set_xlabel('Pitch Class Sets')
-        ax.set_title('Performance by class')
-        ax.set_xticks(x)
+        cm = confusion_matrix(self.gt, self.pred, labels=self.labels)
 
-        ax.set_xticklabels(self.labels)
-        ax.legend()
+        if plot:
+            plt.figure(figsize=(15, 15))
 
-        fig.tight_layout()
-        plt.xticks(rotation=45)
-        plt.show()
+            plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+            plt.title('Confusion Matrix')
+            plt.colorbar(fraction=0.046, pad=0.04)
+            tick_marks = np.arange(len(self.labels))
 
-def accuracy_by_source(test_segments, test_audios, pred, info = True, plot = True):
-    labels_by_source = {'DI': [], 'Mobile': [], 'Computer': [], 'Overall': [], 'Reference': []}
-    pred_by_source = {'DI': [], 'Mobile': [], 'Computer': [], 'Overall': [], 'Reference': []}
-    accuracies_by_source = {'DI': [], 'Mobile': [], 'Computer': [], 'Overall': [], 'Reference': []}
+            plt.xticks(tick_marks, self.labels, rotation=45)
+            plt.yticks(tick_marks, self.labels)
+
+            fmt = 'd'
+            thresh = cm.max() / 2.
+
+            for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+                if cm[i, j] > 0:
+                    plt.text(j, i, format(cm[i, j], fmt),
+                             horizontalalignment="center",
+                             verticalalignment='center',
+                             color="white" if cm[i, j] > thresh else "black")
+            plt.grid(alpha=0.3)
+            plt.tight_layout()
+            plt.ylabel('True label')
+            plt.xlabel('Predicted label')
+            if path:
+                plt.savefig(path)
+            plt.show()
+        return cm
+
+    def per_class_performance(self, path = None):
+        precision, recall, f_score, support = precision_recall_fscore_support(self.gt,
+                                                                              self.pred,
+                                                                              labels=self.labels)
+        precison_recall_bar_plot(precision, recall,support, self.labels , path)
+
+def accuracy_by_source(test_segments,pred, test_audios):
+    performance_source_dict = {}
+    
     for aud in test_audios:
-        audio = aud['name']
-        uid = aud['id']
+        audio = aud['name'] #recording name
+        uid = aud['id'] #recording id
+        
+        #Get performance and recording source/effect/filter
+        performance = audio.split('_')
+        performance = '_'.join(performance[:3])
+        source = audio.split('_')[-1].replace('.wav','')
+        
+        indices = [x == uid for x in test_segments.uids] #indices of chromas belonging to a recording
 
-        indices = [x == uid for x in test_segments.uids]
-
-        if info: display(Markdown('**Processing:** {}'.format(audio)))
-
+        #get predictions and gt for a recording anc calculate accuracy
         gt = list(np.array(test_segments.labels)[indices])
         p = list(np.array(pred)[indices])
 
-        #OM = Overall_Metrics(gt, p)
-        #acc = OM.accuracy(info = info)
-        if '_DI' in audio:
-            #accuracies_by_source['DI'].append(acc)
-            labels_by_source['DI'] = labels_by_source['DI'] + gt
-            pred_by_source['DI'] =  pred_by_source['DI'] + p
-        elif '_Computer' in audio:
-            #accuracies_by_source['Computer'].append(acc)
-            labels_by_source['Computer'] = labels_by_source['Computer'] + gt
-            pred_by_source['Computer'] =  pred_by_source['Computer'] + p
-        elif '_Mobile' in audio:
-            # accuracies_by_source['Mobile'].append(acc)
-            labels_by_source['Mobile'] = labels_by_source['Mobile'] + gt
-            pred_by_source['Mobile'] = pred_by_source['Mobile'] + p
-        elif '_Reference' in audio:
-            #accuracies_by_source['Reference'].append(acc)
-            labels_by_source['Reference'] = labels_by_source['Reference'] + gt
-            pred_by_source['Reference'] = pred_by_source['Reference'] + p
-
-            #accuracies_by_source['Overall'].append(acc)
-        labels_by_source['Overall'] = labels_by_source['Overall'] + gt
-        pred_by_source['Overall'] = pred_by_source['Overall'] + p
-
-    for key in labels_by_source.keys(): #Store accuracy for each source
-        if labels_by_source[key]:
-            OM = Overall_Metrics(labels_by_source[key],pred_by_source[key])
-            accuracies_by_source[key] = OM.accuracy()
-
-    for k in accuracies_by_source.keys(): #Need to have values to compute the mean in each list
-        if not accuracies_by_source[k]:
-            accuracies_by_source[k] = 0
-    if plot:
-        avg_acc = accuracies_by_source['Overall']
-        plot_averages = {'DI': accuracies_by_source['DI'],
-                         'Computer':accuracies_by_source['Computer'],
-                         'Mobile': accuracies_by_source['Mobile'],
-                         'Reference':accuracies_by_source['Reference'] }
-        plot_averages = dict(sorted(plot_averages.items(), key=lambda item: item[1]))
-
-        fig, ax = plt.subplots()
-
-        ax.barh(range(len(plot_averages)), list(plot_averages.values()),
-                color="grey", edgecolor='grey',
-                tick_label=list(plot_averages.keys()),
-                align='center')
-
-        ax.set_xlabel('Accuracy')
-        ax.set_ylabel('Recording Source')
-
-        for index, value in enumerate(plot_averages.values()):
-            plt.text(value, index, str(np.round(value, 4)))
-        plt.title('Averaged accuracy by recording source')
-        plt.axvline(x=avg_acc)
-        plt.grid(alpha=0.02)
-        plt.show()
-    return accuracies_by_source
-
+        OM = Overall_Metrics(gt, p)
+        acc = OM.accuracy(info = False)
+        
+        
+        if performance not in performance_source_dict.keys():
+            performance_source_dict[performance] = {}
+        
+        performance_source_dict[performance][source] = acc
+    
+    results = pd.DataFrame(performance_source_dict).transpose()
+    
+    def get_song(s):
+        recording_name = s.name.split('_')
+        s['Song'] = recording_name [0]
+        
+        s['Performance'] = '_'.join(recording_name[:2])
+        return s
+    results = results.apply(lambda x: get_song(x), axis=1)
+    
+    return results
 
 class Individual_Metrics():
     def __init__(self,annotation, audio,
-                 model = './test_code/test_utils/models/Baseline.pkl',
-                 info = True, debug = True):
+                 model = '../MODELS/cross-validation/Baseline_Case.pkl',
+                 info = True, debug = True, labels_kinds = ['maj','min','5','1','+3','-3'] ):
 
         self.info = info
         self.debug = debug
@@ -171,12 +208,18 @@ class Individual_Metrics():
         self.audio_file = open(audio, "r", encoding="utf-8")
     
         #Load GT and Predicitons
-        self.real_segments, self.pred = self.all_chroma_scores(self.annotation, self.audio_file.name, model)
+        no_thirds = True
+        if ('+3' in labels_kinds) and ('-3' in labels_kinds):
+            no_thirds = False
+            
+        self.real_segments, self.pred = self.all_chroma_scores(self.annotation, self.audio_file.name, model, no_thirds = no_thirds)
+        
         self.audio_file.close()
         
         self.pred = [str(self.pred[i]) for i in range(0,len(self.pred))]
         self.gt = [x.replace('(','') for x in self.real_segments.labels]
         self.gt = [x.replace(')','') for x in self.gt]
+        
         for i,p in enumerate(self.gt):
             if '1,3' in p:
                 self.gt[i] = self.gt[i].replace('1,3','+3')
@@ -186,11 +229,11 @@ class Individual_Metrics():
                 pass
         
         #Load all possible pitch class sets defined by the model
-        self.pitch_class_names = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
-        self.pitch_class_kinds = ['maj','min','5','1','+3','-3']
-        pitch_classes_matrix = np.array(np.meshgrid(self.pitch_class_names,self.pitch_class_kinds)).T.reshape(-1,2)
-        self.list_pitch_classes =[':'.join(x) for x in pitch_classes_matrix]
-        
+#         self.pitch_class_names = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
+#         self.pitch_class_kinds = labels_kinds
+#         pitch_classes_matrix = np.array(np.meshgrid(self.pitch_class_names,self.pitch_class_kinds)).T.reshape(-1,2)
+#         self.list_pitch_classes =[':'.join(x) for x in pitch_classes_matrix]
+        self.list_pitch_classes = list(set(self.gt + self.pred))
         # Classify notes by its duration
         self.measure_duration, self.notes_durations = self.classify_note_durations()
         #Variable where the confusion matrix will be stored
@@ -257,15 +300,31 @@ class Individual_Metrics():
                 i += 1
         return np.round(measure_duration,2), notes_durations
     
-    def all_chroma_scores(self,anno_file, audio_file , model):
+    def all_chroma_scores(self,anno_file, audio_file , model, no_thirds = False):
         """
         Return GT and predicte pitch class sets.
         """
         
-        m = load_model(model)
-        lu, nlu, real_segments = estimate_segment_scores(anno_file, audio_file, m)
-
-        predicted, plu = m.predict(real_segments.chromas)
+        m = joblib.load(model)
+        _,_, real_segments = estimate_segment_scores(anno_file, audio_file, m)
+        
+        if no_thirds: #filter out third intervals if needed for testing purposes
+            for i, k in enumerate(real_segments.kinds):
+                if k == '+3' or k == '-3':
+                    real_segments.kinds[i] = 'unclassified'
+                    
+            is_defined = [x != 'unclassified' for x in real_segments.kinds]
+            
+            real_segments = AnnotatedChromaSegments(
+                real_segments.labels[is_defined],
+                real_segments.pitches[is_defined],
+                real_segments.kinds[is_defined],
+                real_segments.chromas[is_defined],
+                real_segments.uids[is_defined],
+                real_segments.start_times[is_defined],
+                real_segments.durations[is_defined])  
+            
+        predicted,_ = m.predict(real_segments.chromas)
 
             
     #     plot_chroma_scores(real_segments,predicted)
@@ -484,7 +543,7 @@ class Individual_Metrics():
                  
         return percentage_missed, not_found_chromas
     def plot_chroma_scores(self):
-        plt.rcParams.update({'font.size': 10})
+        plt.rcParams.update({'font.size': 30})
         fig = plt.figure(figsize=(40,10))
         ax = fig.add_subplot(111)
         
@@ -497,8 +556,8 @@ class Individual_Metrics():
         
         
         
-        cbar = fig.colorbar(img, ax=ax, shrink=0.1, orientation="vertical")
-        cbar.set_label('Probability')
+#         cbar = fig.colorbar(img, ax=ax, shrink=0.1, orientation="vertical")
+#         cbar.set_label('Intensity')
 
         ax.set_xticks(range(len(self.pred)))
         ax.set_yticks(range(12))
@@ -510,9 +569,10 @@ class Individual_Metrics():
         ax.set_xticklabels(x_label_list)
         ax.set_yticklabels(['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
         ax.set_xlabel("Predicted <-- GT note")
-        ax.set_ylabel('Predicted probabilities')
+        ax.set_ylabel('Predicted intensities')
         
         plt.xticks(rotation=-90)
+ 
         plt.grid(color='w',alpha = 0.3, linestyle='-', linewidth=1)
         plt.title('Pysimmusic Predictions')
         plt.show()
