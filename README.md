@@ -5,10 +5,8 @@ This repository contains the database and codes developed by Eduard Vergés Fran
 
 *The aim of this project is to contribute to the development of a music transcription system of guitar performances in the context of music education. Using the Music Critic system as a baseline we identified aspects to improve and then we implemented and tested our contributions. We show how the system reacts to different contextual variations and discuss possible repercussions on a real context application. Also, we studied how the model used behaves using different training conditions. Furthermore,  the *Five Guitar dataset*, with 90 guitar recordings, is designed especially for this project and publicly available. We use a data augmentation strategy to obtain a higher number of recordings simulating different rooms, mics, effects and recording setups. We observe that room acoustics and recording setup could generate biases on the final performance of the model and that the system is consistent according to timber. Also, we discover the need of representing all the pitch-class sets into the training set, which could be a limitation in a real situation, plus a high bias in the model.*
 
-Its main contribution is the creation of the **Five Guitar Dataset** and a series of codes to perform data augmentation strategy and obtain a large number of recordings.
-
 # Datasets
-This project has two dataset inside:
+This project has two datasets inside:
 
 * Impulse responses dataset, that could be downloaded in the link provided inside *Databases/IR/* repository.
 * The Five Guitar Dataset,inside *Database/Raw_database/* repository, that can be found in Zenodo.
@@ -44,4 +42,3 @@ This project has a high number of dependencies. A part from the private MTG pyth
 * 2. pip install sox
 * 3. pip install essentia
 * 4. All the requirements used by MTG private library.
-* 
