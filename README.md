@@ -1,4 +1,5 @@
 # TFG_EduardVergesFranch
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 # Introduction
 This repository contains the database and codes developed by Eduard Vergés Franch in his final degree project, in the course 2020/2021.
