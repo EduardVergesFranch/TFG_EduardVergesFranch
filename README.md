@@ -12,15 +12,15 @@ This project has two datasets inside:
 * Impulse responses dataset, that could be downloaded in the link provided inside *Databases/IR/* repository.
 * The Five Guitar Dataset,inside *Database/Raw_database/* repository, that can be found in Zenodo.
 
-The process for obtaining the complete dataset is first two download the previous two datasets and paste its content inside the correspondend folders. Then, sequentially run the *Build_Augmented_dataset.ipynb* and *Renaming_files.ipynb* notebooks found inside *Code/* repository.
+The process for obtaining the complete dataset is first two download the previous two datasets and paste its content inside the correspondend folders. Then, sequentially run the *Build_Augmented_database.ipynb* and *Renaming_Files.ipynb* notebooks found inside *Code/* repository.
 
 After doing all this steps, all the data used for the project would be disponible.
 
 # Steps to run the code
 
-* 1. Download the datasets in previous section.
-* 2. Run *Build_Augmented_dataset.ipynb* and *Renaming_files.ipynb* notebooks found inside *Code/* repository.
-* 3. Run the *Experiments* notebooks inside *Code/* repository.
+* Download the datasets in previous section.
+* Run *Build_Augmented_database.ipynb* and *Renaming_Files.ipynb* notebooks found inside *Code/* repository.
+* Run the *Experiments* notebooks inside *Code/* repository.
 
 **Download links**
 
