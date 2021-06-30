@@ -39,7 +39,7 @@ The project makes use of a private python library and little dataset (refered as
 # Dependencies
 
 This project has a high number of dependencies. A part from the private MTG python library, it also makes use of:
-* 1. Python version 3.6.8
-* 2. pip install sox
-* 3. pip install essentia
-* 4. All the requirements used by MTG private library.
+* Python version 3.6.8
+* pip install sox
+* pip install essentia
+* All the requirements used by MTG private library.
