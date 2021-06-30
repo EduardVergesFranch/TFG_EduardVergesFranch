@@ -1,1 +1,0 @@
-This folder contains the IR used from the MIR impulse response pack. (https://mcdermottlab.mit.edu/Reverb/IR_Survey.html)

@@ -64,7 +64,7 @@ class NewModel(CorrectnessBalanceResidualsModel):
         """
         in_chroma_sums = dict()
 
-        for k in self.kinds: #maj, min , 1, 5 , +3, -3
+        for k in self.kinds: # maj, min , 1, 5 , +3, -3
             chroma_raw = segments.chromas[segments.kinds == k]
             if chroma_raw.shape[0] >= 2:
                 chroma = self.preprocess(chroma_raw)
@@ -310,7 +310,7 @@ if __name__ == "__main__":
 
     new_model = NewModel(
         {'maj':['I', 'III', 'V'], 'min':['I', 'IIIb', 'V'], '5':['I', 'V'], '1':['I', 'V', 'III'],
-         '+3':['I','III'], 'b3':['bIII']},
+         '+3':['I','III'], 'b3':['I','bIII']},
 
         {'maj':{'n_components':1, 'covariance_type':'full', 'max_iter':200},
          'min':{'n_components':1, 'covariance_type':'full', 'max_iter':200},

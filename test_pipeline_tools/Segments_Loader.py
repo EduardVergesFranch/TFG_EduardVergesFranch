@@ -140,14 +140,17 @@ class SEGMENTS_LOADER():
 
         return load_file_list(list, self.base_path)
 
-    def load_chromas_annotation_list(self, list):
+    def load_chromas_annotation_list(self, list,roll_to_c = True):
 
         list = self.load_annotation_list(os.path.join(self.base_path,list))
+        
         print('Loaded {} files.'.format(len(list)))
+        
         chromaEstimator = AnnotatedBeatChromaEstimator(
             chroma_estimator=NNLSChromaEstimator(),
             segment_chroma_estimator=AdaptiveChromaEstimator(),
             label_translator=GuitarLabelTranslator(),
+            roll_to_c_root= roll_to_c ,
             uid_extractor=SimUidAndAudioPathExtractor(self.base_path))
         return chromaEstimator.load_chromas_for_annotation_file_list(list)
 

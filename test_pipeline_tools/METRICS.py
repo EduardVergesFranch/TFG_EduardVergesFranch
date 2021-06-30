@@ -568,12 +568,12 @@ class Individual_Metrics():
         
         ax.set_xticklabels(x_label_list)
         ax.set_yticklabels(['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
-        ax.set_xlabel("Predicted <-- GT note")
-        ax.set_ylabel('Predicted intensities')
+        ax.set_xlabel("Predicted <-- True ")
+        ax.set_ylabel('Degrees')
         
         plt.xticks(rotation=-90)
  
         plt.grid(color='w',alpha = 0.3, linestyle='-', linewidth=1)
-        plt.title('Pysimmusic Predictions')
+        plt.title('Pitch class set prediction per chroma')
         plt.show()
 

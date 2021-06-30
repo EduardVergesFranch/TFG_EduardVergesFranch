@@ -1,3 +1,0 @@
-Acords a negres -> Test onsets
-Hi ha una part que es toquen notes
-----> Evaluar onsets i pitch detection
